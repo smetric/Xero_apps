@@ -6,6 +6,7 @@ Created on Thu Oct 10 12:28:05 2019
 """
 
 import os
+import stat
 from os import path, remove
 from time import sleep
 import sys
@@ -38,7 +39,8 @@ class DriverBuilder():
         self.download_dir = download_dir
         self.headless = headless
         self.driver_path = driver_path
-        
+        st = os.stat(driver_path)
+        os.chmod(driver_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
         chrome_options = chrome_webdriver.Options()
         if download_dir:
             prefs = {'download.default_directory': download_dir,
@@ -46,7 +48,7 @@ class DriverBuilder():
                      'download.directory_upgrade': True,
                      'safebrowsing.enabled': False,
                      'safebrowsing.disable_download_protection': True}
-
+           
             chrome_options.add_experimental_option('prefs', prefs)
 
         if headless:
