@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 """
 Created on Thu Oct 10 12:28:05 2019
@@ -29,7 +28,7 @@ from datetime import datetime
 
 class DriverBuilder():
     
-    def __init__(self, download_dir=None, headless=False, driver_path = os.path.join(os.getcwd(), "drivers/chromedriver")):
+    def __init__(self, download_dir=None, headless=False, driver_path = "/code/chromedriver"):
         try:
             print("making tmp directory for saving csvs", download_dir)
             os.makedirs(download_dir)
@@ -255,6 +254,7 @@ def get_region_urls(wd, region):
         wd.driver.implicitly_wait(5)
         search_input.send_keys(u'\ue007')
         search_input.send_keys(u'\ue007')
+        print('in the region page')
 
 #    contents = wd.driver.find_elements_by_tag_name('a')
 #    region_urls = []
@@ -327,16 +327,18 @@ def pagination(wd, n_retries = 0, retry_limit = 10):
 def get_advisor_url(wd, region_url, first):
     advisor_urls=[]
     advisors=[] 
-    print("get_advisor "+str(first))
     print("get_advisor "+region_url)
     
-    wd.driver.get(Current_page_url)
-    
+#    if Current_page_url:
+#        wd.driver.get(Current_page_url)
+    sleep(5)
     advisor_names = wd.driver.find_elements_by_class_name('advisors-result-card-brand-image')
     advisor_links = wd.driver.find_elements_by_class_name('advisors-result-card-link')
     search_result_batch = wd.driver.find_element_by_class_name('searchfilterresults-advisors')
-    search_results = wd.driver.find_element_by_xpath("/html/body/main/div[2]/div[2]/div[1]/div/div/div/div[1]")
-    search_result_total = search_results.text
+    wd.driver.implicitly_wait(5)
+    search_results = wd.driver.find_element_by_class_name('advisor-search-tally')
+    search_results_p = search_results.find_element_by_tag_name('p')
+    search_result_total = search_results_p.text
     search_result_total = search_result_total.split(' ')
     search_result_batch = search_result_batch.get_attribute('data-global-search-batch')
     advisor_pages = int(search_result_total[3]) / int(search_result_batch)
@@ -389,11 +391,16 @@ def search_by_region(wd, base_url, region):
         state = 'null'
     sleep(5)
     search_input.send_keys(u'\ue007')
+    sleep(2)
     return search_input_text
 
 
 def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=True):
     
+    
+#    os.system("export PYTHONIOENCODING=utf8")
+  
+    print('command should run')
     outdir = Path(datadir) / 'out/tables/'
     
     if sys.platform.startswith("win"):
@@ -410,10 +417,11 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
         for region in regions:
             location = search_by_region(wd, base_url, region)
             Current_page_url = wd.driver.current_url
-            
             advisor_data = get_advisor_url(wd, region, 0)
             advisor_df = advisor_data['advisor_url_df']
             page_number = advisor_data['page_numbers']
+            
+            
 #            advisor_pagination_url = advisor_data['advisor_page']
             for k in range(1, page_number):
                 apps_df = get_advisor_apps(wd, advisor_df, location, k, Current_page_url)
@@ -430,13 +438,13 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
         
         
 def testing():
-    os.chdir("C:/Users/Nayana Patil/Github/xero-connected-app")
-    with open("data/config.json") as f:
-        cfg = json.load(f)
-    params = cfg["parameters"]
-    headless = False
-    datadir = 'data/'
-    download_dir = "tmp\\downloads"
+        os.chdir("D:/xero_apps")
+        with open("data/config.json") as f:
+            cfg = json.load(f)
+        params = cfg["parameters"]
+        headless = False
+        datadir = 'data/'
+        download_dir = "tmp\\downloads"
 
 if __name__ == "__main__":
     with open("/data/config.json") as f:
