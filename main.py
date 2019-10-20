@@ -69,10 +69,15 @@ class DriverBuilder():
         self.close()
         
     def open(self):
-        if sys.platform.startswith("win"):
+        if sys.platform.startswith("win") and not self.driver_path.endswith('.exe') and not self.driver_path.lower() == 'default':
             self.driver_path += ".exe"
+            
+        print("Using driver path: {}".format(self.driver_path))
         
-        self.driver = Chrome(chrome_options=self.chrome_options, executable_path=self.driver_path)
+        if self.driver_path.lower() == 'default':
+            self.driver = Chrome(chrome_options=self.chrome_options)
+        else:
+            self.driver = Chrome(chrome_options=self.chrome_options, executable_path=str(Path(self.driver_path)))
         
         if self.headless:
             self.enable_download_in_headless_chrome(self.driver, self.download_dir)
