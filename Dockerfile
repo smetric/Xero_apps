@@ -6,6 +6,7 @@ RUN apt-get update && \
     curl https://chromedriver.storage.googleapis.com/77.0.3865.40/chromedriver_linux64.zip -o ~/chromedriver.zip && \
     python3 -m zipfile -e ~/chromedriver.zip /usr/local/bin/ && \
     chmod a+x /usr/local/bin/chromedriver && \
+    chmod a+x /drivers/chromedriver && \
     rm ~/chromedriver.zip
 
 RUN pip3 install --upgrade --no-cache-dir \
@@ -18,4 +19,5 @@ RUN pip3 install --upgrade --no-cache-dir \
 
 WORKDIR /code/
 COPY . /code/
+COPY drivers /drivers/
 CMD python3 -u /code/main.py
