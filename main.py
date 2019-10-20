@@ -28,7 +28,7 @@ from datetime import datetime
 
 class DriverBuilder():
     
-    def __init__(self, download_dir=None, headless=False, driver_path = "/code/chromedriver"):
+    def __init__(self, download_dir=None, headless=False, driver_path = os.path.join(os.getcwd(), "drivers/chromedriver")):
         try:
             print("making tmp directory for saving csvs", download_dir)
             os.makedirs(download_dir)
