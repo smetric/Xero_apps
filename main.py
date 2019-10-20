@@ -39,6 +39,7 @@ class DriverBuilder():
         self.download_dir = download_dir
         self.headless = headless
         self.driver_path = driver_path
+        st = os.stat(driver_path)
         st = os.stat(os.path.join(os.getcwd(), "drivers/chromedriver"))
         os.chmod(driver_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
         chrome_options = chrome_webdriver.Options()
