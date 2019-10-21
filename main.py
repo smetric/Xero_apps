@@ -39,10 +39,10 @@ class DriverBuilder():
         self.download_dir = download_dir
         self.headless = headless
         self.driver_path = driver_path
-        st = os.stat(driver_path)
-        st1 = os.stat(os.path.join(os.getcwd(), "drivers/chromedriver"))
-        os.chmod(driver_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-        os.chmod(os.path.join(os.getcwd(), "drivers/chromedriver"), st1.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+#        st = os.stat(driver_path)
+#        st1 = os.stat(os.path.join(os.getcwd(), "drivers/chromedriver"))
+#        os.chmod(driver_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+#        os.chmod(os.path.join(os.getcwd(), "drivers/chromedriver"), st1.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
         chrome_options = chrome_webdriver.Options()
         if download_dir:
             prefs = {'download.default_directory': download_dir,
@@ -404,7 +404,7 @@ def search_by_region(wd, base_url, region):
     return search_input_text
 
 
-def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=True):
+def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=True, driver_path = "default"):
     
     
 #    os.system("export PYTHONIOENCODING=utf8")
