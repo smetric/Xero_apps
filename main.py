@@ -355,15 +355,15 @@ def get_advisor_apps(wd, advisor_df, location, page, Current_page_url):
     apps_advisors = []
     advisor_urls = advisor_df.Advisor_url
     for j in range(len(advisor_urls)):
-        print("Region: '{region}', Page: '{page}', Advisor: '{advisor}'".format(region = location, page = page, advisor = advisor_df.iloc[j].Advisor))
+#        print("Region: '{region}', Page: '{page}', Advisor: '{advisor}'".format(region = location, page = page, advisor = advisor_df.iloc[j].Advisor))
         wd.driver.get(advisor_df.iloc[j].Advisor_url)
         apps = wd.driver.find_elements_by_class_name('advisors-profile-experience-app-icon')
         for i in range(len(apps)):
             apps_advisors.append(advisor_df.iloc[j].Advisor)
             apps_alt.append(apps[i].get_attribute('alt'))
-             
+            
     wd.driver.get(Current_page_url)
-    return pd.DataFrame({'city': location, 'Page':page,'Advisors': apps_advisors, 'App': apps_alt,})
+    return pd.DataFrame({'city': location, 'Advisors': apps_advisors, 'App': apps_alt,})
           
 
 def search_by_region(wd, base_url, region):
@@ -435,7 +435,7 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
                 apps_df = get_advisor_apps(wd, advisor_df, location, k, Current_page_url)
 #                xero_apps_df = xero_apps_df.append(apps_df, ignore_index = True)
                 write_csv(df = apps_df, fp = Path(outdir) / (filename + '.csv'))
-                
+                print('appended')
                 pagination(wd)
                 Current_page_url = wd.driver.current_url
                 print(Current_page_url)
