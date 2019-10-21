@@ -431,11 +431,12 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
             
 #            advisor_pagination_url = advisor_data['advisor_page']
             for k in range(1, page_number):
-                
+                wd.driver.manage().deleteAllCookies()
                 apps_df = get_advisor_apps(wd, advisor_df, location, k, Current_page_url)
 #                xero_apps_df = xero_apps_df.append(apps_df, ignore_index = True)
                 write_csv(df = apps_df, fp = Path(outdir) / (filename + '.csv'))
                 print('appended')
+                print(len(apps_df))
                 pagination(wd)
                 Current_page_url = wd.driver.current_url
                 print(Current_page_url)
