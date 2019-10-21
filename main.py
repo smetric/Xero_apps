@@ -28,9 +28,8 @@ from pytz import timezone
 from datetime import datetime
 
 class DriverBuilder():
-    
-    def __init__(self, download_dir=None, headless=False, driver_path = '/code/drivers/chromedriver'):
-        try:
+    def __init__(self, download_dir=None, headless=False, driver_path = "/code/chromedriver"): # driver_path = os.path.join(os.getcwd(), "drivers/chromedriver")
+        try: 
             print("making tmp directory for saving csvs", download_dir)
             os.makedirs(download_dir)
         except FileExistsError:
@@ -39,10 +38,7 @@ class DriverBuilder():
         self.download_dir = download_dir
         self.headless = headless
         self.driver_path = driver_path
-#        st = os.stat(driver_path)
-#        st1 = os.stat(os.path.join(os.getcwd(), "drivers/chromedriver"))
-#        os.chmod(driver_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-#        os.chmod(os.path.join(os.getcwd(), "drivers/chromedriver"), st1.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        
         chrome_options = chrome_webdriver.Options()
         if download_dir:
             prefs = {'download.default_directory': download_dir,
@@ -50,7 +46,7 @@ class DriverBuilder():
                      'download.directory_upgrade': True,
                      'safebrowsing.enabled': False,
                      'safebrowsing.disable_download_protection': True}
-           
+
             chrome_options.add_experimental_option('prefs', prefs)
 
         if headless:
@@ -62,6 +58,9 @@ class DriverBuilder():
         chrome_options.add_argument("--disable-gpu") # applicable to windows os only
         chrome_options.add_argument("--disable-dev-shm-usage") # overcome limited resource problems
         chrome_options.add_argument("--no-sandbox") # Bypass OS security model
+        
+        chrome_options.add_argument("--enable-javascript")
+#        chrome_options.add_argument("--disable-popup-blocking")
             
         self.chrome_options = chrome_options
     
@@ -90,6 +89,18 @@ class DriverBuilder():
         
     def close(self):
         self.driver.quit()
+        
+    def enable_download_in_headless_chrome_old(self):
+        # downloading files in headless mode doesn't work!
+        # file isn't downloaded and no error is thrown
+        #add missing support for chrome "send_command"  to selenium webdriver
+        # https://bugs.chromium.org/p/chromium/issues/detail?id=696481#c39
+        self.driver.command_executor._commands["send_command"] = ("POST", '/session/{}/chromium/send_command'.format(self.driver.session_id))
+        params = {
+            'cmd': 'Page.setDownloadBehavior',
+            'params': {'behavior': 'allow', 'downloadPath': self.download_dir}
+        }
+        self.driver.execute("send_command", params)
 
     def enable_download_in_headless_chrome(self, driver, download_dir):
         """
@@ -108,32 +119,6 @@ class DriverBuilder():
         for key in command_result:
             print("result:" + key + ":" + str(command_result[key]))
             
-    def login(self, creds, url='https://app.corecon.com/dist/index.html#/login', element_ids = {"company_id": "companyid", "username": "username", "#password": "password"}):
-        # Change this function to your needs and add other functions, etc...
-        print("Logging in")
-        
-        # CHANGE THIS METHOD
-        
-        self.driver.get(url)
-        sleep(10)
-        
-        for key in creds.keys():
-            sleep(1)
-            field = self.driver.find_element_by_id(element_ids[key])
-            field.clear()
-            field.send_keys(creds[key])
-        
-        field.send_keys(Keys.RETURN)
-        sleep(10)
-        
-        title = self.driver.title
-        if "Corecon" not in title:
-            raise AuthenticationError(
-                ("Probably didn't authenticate sucesfully. "
-                 "The title says '{}'. Please check your credentials.").format(title))
-        
-        print("Logged in")
-        
     def get_report(
             self,
             url = '',

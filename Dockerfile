@@ -19,5 +19,4 @@ RUN pip3 install --upgrade --no-cache-dir \
 WORKDIR /code/
 COPY . /code/
 COPY drivers /drivers/
-RUN chmod a+x /drivers/chromedriver
 CMD python3 -u /code/main.py
