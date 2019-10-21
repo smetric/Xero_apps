@@ -29,7 +29,7 @@ from datetime import datetime
 
 class DriverBuilder():
     
-    def __init__(self, download_dir=None, headless=False, driver_path = os.path.join(os.getcwd(), "drivers/chromedriver")):
+    def __init__(self, download_dir=None, headless=False, driver_path = '/code/drivers/chromedriver'):
         try:
             print("making tmp directory for saving csvs", download_dir)
             os.makedirs(download_dir)
@@ -40,8 +40,9 @@ class DriverBuilder():
         self.headless = headless
         self.driver_path = driver_path
         st = os.stat(driver_path)
-        st = os.stat(os.path.join(os.getcwd(), "drivers/chromedriver"))
+        st1 = os.stat(os.path.join(os.getcwd(), "drivers/chromedriver"))
         os.chmod(driver_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        os.chmod(os.path.join(os.getcwd(), "drivers/chromedriver"), st1.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
         chrome_options = chrome_webdriver.Options()
         if download_dir:
             prefs = {'download.default_directory': download_dir,
