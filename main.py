@@ -388,9 +388,21 @@ def search_by_region(wd, base_url, region):
     sleep(2)
     return search_input_text
 
+def write_csv(df, fp, fp_exists_mode = 'a', index = False, header = False):
+    
+    def align_cols(df, fp):
+        check_df = pd.read_csv(fp, nrows = 1)
+        check_df = check_df.append(df, ignore_index = True, sort = True)
+        return check_df[1:]
+    
+    if not fp.exists():
+        df.to_csv(fp, index = index)
+    else:
+        df = align_cols(df, fp)
+        df.to_csv(fp, mode = fp_exists_mode, index = index, header = header)
+
 
 def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=True, driver_path = "default"):
-    
     
 #    os.system("export PYTHONIOENCODING=utf8")
   
@@ -405,9 +417,10 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
         #start new
     base_url = params.get('base_url', "https://www.xero.com/nz/advisors/find-advisors/")
     regions = params.get('regions')#use this format for optional arguments
+    filename = params.get('filename')
     wd = DriverBuilder(headless= headless, download_dir=download_dir, driver_path = driver_path)
     with wd:# USE wd.open() instead to open window and wd.close() to close window
-        xero_apps_df = pd.DataFrame()
+#        xero_apps_df = pd.DataFrame()
         for region in regions:
             location = search_by_region(wd, base_url, region)
             Current_page_url = wd.driver.current_url
@@ -418,15 +431,17 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
             
 #            advisor_pagination_url = advisor_data['advisor_page']
             for k in range(1, page_number):
+                
                 apps_df = get_advisor_apps(wd, advisor_df, location, k, Current_page_url)
-                xero_apps_df = xero_apps_df.append(apps_df, ignore_index = True)
+#                xero_apps_df = xero_apps_df.append(apps_df, ignore_index = True)
+                write_csv(df = apps_df, fp = Path(outdir) / (filename + '.csv'))
                 
                 pagination(wd)
                 Current_page_url = wd.driver.current_url
                 print(Current_page_url)
                 advisor_data = get_advisor_url(wd, Current_page_url, k)
                 advisor_df = advisor_data['advisor_url_df']
-        xero_apps_df.to_csv (r'C:\Users\Nayana Patil\Github\xero-connected-app\tmp\downloads\Xero_Apps_NZ.csv', index = None, header=True)
+#        xero_apps_df.to_csv (r'C:\Users\Nayana Patil\Github\xero-connected-app\tmp\downloads\Xero_Apps_NZ.csv', index = None, header=True)
 #       
         
         
@@ -439,7 +454,8 @@ def testing():
         headless = False
         datadir = 'data/'
         download_dir = "tmp\\downloads"
-
+        driver_path = os.path.join(os.getcwd(), "drivers/chromedriver")
+        
 if __name__ == "__main__":
     with open("/data/config.json") as f:
         cfg = json.load(f)
