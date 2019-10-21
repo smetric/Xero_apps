@@ -17,7 +17,6 @@ from selenium.webdriver.chrome import webdriver as chrome_webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException
-
 import json
 import traceback
 import shutil
@@ -434,7 +433,8 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
                 
                 apps_df = get_advisor_apps(wd, advisor_df, location, k, Current_page_url)
 #                xero_apps_df = xero_apps_df.append(apps_df, ignore_index = True)
-                write_csv(df = apps_df, fp = Path(outdir) / (filename + '.csv'))
+                filename = filename + '.csv'
+                write_csv(df = apps_df, fp = Path(outdir) +'/'+ filename)
                 
                 pagination(wd)
                 Current_page_url = wd.driver.current_url
