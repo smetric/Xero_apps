@@ -405,7 +405,7 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
         #start new
     base_url = params.get('base_url', "https://www.xero.com/nz/advisors/find-advisors/")
     regions = params.get('regions')#use this format for optional arguments
-    wd = DriverBuilder(headless= headless, download_dir=download_dir)
+    wd = DriverBuilder(headless= headless, download_dir=download_dir, driver_path = driver_path)
     with wd:# USE wd.open() instead to open window and wd.close() to close window
         xero_apps_df = pd.DataFrame()
         for region in regions:
