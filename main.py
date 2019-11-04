@@ -285,7 +285,7 @@ def get_advisor_url_pagination():
     
     return pd.DataFrame({'Advisor_url': temp_advisor_urls, 'Advisor': temp_advisors})   
   
-def pagination(wd, n_retries = 0, retry_limit = 10):
+def pagination(wd, n_retries = 0, retry_limit = 20):
     try:
         next_button = wd.driver.find_element_by_xpath("//button[@class='pagination-direction pagination-next']")
         next_button.click()
@@ -344,6 +344,7 @@ def get_advisor_url(wd, region_url, first):
     advisor_data=dict()
     advisor_data['advisor_url_df']= pd.DataFrame({'Advisor_url': advisor_urls, 'Advisor': advisors})
     advisor_data['page_numbers'] = round(advisor_pages)
+    print('page numbers'+ str(round(advisor_pages)))
 #    advisor_data['advisor_page'] = Current_page_url
 #    print("advisor_page"+advisor_data['advisor_page'])
         
@@ -363,7 +364,7 @@ def get_advisor_apps(wd, advisor_df, location, page, Current_page_url):
             apps_alt.append(apps[i].get_attribute('alt'))
             
     wd.driver.get(Current_page_url)
-    return pd.DataFrame({'city': location, 'Advisors': apps_advisors, 'App': apps_alt,})
+    return pd.DataFrame({'city': location, 'Advisors': apps_advisors, 'App': apps_alt, 'page': page})
           
 
 def search_by_region(wd, base_url, region):
@@ -392,7 +393,7 @@ def write_csv(df, fp, fp_exists_mode = 'a', index = False, header = False):
     
     def align_cols(df, fp):
         check_df = pd.read_csv(fp, nrows = 1)
-        check_df = check_df.append(df, ignore_index = True, sort = True)
+        check_df = check_df.append(df, ignore_index = True)
         return check_df[1:]
     
     if not fp.exists():
@@ -434,7 +435,7 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
                 wd.driver.delete_all_cookies()
                 apps_df = get_advisor_apps(wd, advisor_df, location, k, Current_page_url)
 #                xero_apps_df = xero_apps_df.append(apps_df, ignore_index = True)
-                write_csv(df = apps_df, fp = Path(outdir) / (filename + '.csv'))
+                write_csv(df = apps_df, fp = Path(outdir) / (region + '.csv'))
                 print('appended')
                 print(len(apps_df))
                 pagination(wd)
