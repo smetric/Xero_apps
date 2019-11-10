@@ -30,7 +30,7 @@ from datetime import datetime
 class DriverBuilder():
     def __init__(self, download_dir=None, headless=False, driver_path = "/code/chromedriver"): # driver_path = os.path.join(os.getcwd(), "drivers/chromedriver")
         try: 
-            print("making tmp directory for saving csvs", download_dir)
+#            print("making tmp directory for saving csvs", download_dir)
             os.makedirs(download_dir)
         except FileExistsError:
             pass
@@ -118,172 +118,37 @@ class DriverBuilder():
         print("response from browser:")
         for key in command_result:
             print("result:" + key + ":" + str(command_result[key]))
-            
-    def get_report(
-            self,
-            url = '',
-            projects = ''
-            ):
-        
-        # DELETABLE
-        
-        print("get_report")
-        
-#        url = "https://app.corecon.com/OldUI/Dashboards/DashboardMain.aspx"
-        url = "https://www.xero.com/nz/advisors/"
-        self.driver.get(url)
-        sleep(5)
-        
-        self.select_projects(url = url, projects = projects)
-        
-        export_button = self.driver.find_element_by_id("lnkExport")
-        export_button.click()
-        
-        final_export_button = self.driver.find_element_by_xpath("//*[contains(text(), 'Export to Excel')]")
-        final_export_button.click()
-        
-#        count = 0 #for debug
-#        limit = 20
-        while True:
-            report_path = glob_csv(self.download_dir)
-            files = []
-            for i in range(len(report_path)):
-                file = report_path[i]
-                if file.name.endswith('.csv'):
-                    files.append(file)
-                else:
-                    continue
-#            if count > limit: #for debug
-#                raise ValueError("Looping too many times") #for debug
-            if not files:
-                print("Waiting for the report to be downloaded")
-                sleep(5)
-            else:
-                print("Report downloaded to ", files)
-                sleep(3)
-                break
-        
-    def select_projects(
-            self,
-            url = '',
-            projects = []
-            ):
-        
-        #DELETABLE
-        
-        print("select_projects")
-        
-        url = url.replace('.aspx', 'Filter.aspx')
-        self.driver.get(url)
-        sleep(5)
-        
-        project_filter_type_element = self.driver.find_element_by_name("ctl00$ContentPlaceHolder1$ddlProjectFilterType")
-        select = Select(project_filter_type_element)
-        select.select_by_visible_text("Multiple Active Only")
-        sleep(2)
-        
-        if type(projects) != list:
-            print("Logging: Object 'projects' is not of type 'list'. Defaulting to all projects.")
-            check_all_projects_element = self.driver.find_element_by_id("chkAllProjects")
-            check_all_projects_element.click()
-        else:
-            raise ValueError("Specific project selection not implemented yet")
-            
-        sleep(3)
-        
-        submit_button = self.driver.find_element_by_id("ctl00_ContentPlaceHolder1_btnSelect__3")
-        sleep(1)
-        submit_button.click()
-        
-        sleep(5)
-    
-    def _locate_export_button(self, element_id = "reportoptions"):
-#        print("Looking for export button")
-        btn = self.driver.find_element_by_id(element_id)
-        return(btn)
-    
-def glob_csv(csv_dir):
-    return list(Path(csv_dir).glob("*.csv*"))
+   
 
-def robotize_date(dt_str, tz = "Pacific/Auckland"):
-    if dt_str is None:
-        return
-    cal = parsedatetime.Calendar()
-    t_struct, status = cal.parseDT(dt_str, tzinfo = timezone(tz))
-    if status != 1:
-        raise ValueError("Couldn't convert '{}' to a datetime".format(dt_str))
-    print(t_struct)
-    d = t_struct.date()
-    converted = str(d)
-    print("Converted", dt_str, "to", converted)
-    return d
-
-def clean_file(download_dir, skip_rows = 0):
-    #DELETABLE
-    paths = glob_csv(download_dir)
-    for file in paths:
-#        df_header = pd.read_csv(file, chunksize = 1, nrows = skip_rows)
-        df = pd.read_csv(file, skiprows = skip_rows)
-        df.to_csv(file, index = False)
-
-def move_file(download_dir, outdir, filenames = None):
-    #DELETABLE
-    paths = glob_csv(download_dir)
-    for i in range(len(paths)):
-        path = paths[i]
-        if filenames is None:
-            filename = path.name
-            split = filename.split('.')
-            filename = '.'.join([split[0],split[len(split)-1]])
-        else:
-            filename = filenames[i].replace(' ', '_')
-        print("Moving: " + str(path) + " to " + str(outdir / filename))
-        shutil.move(path, outdir / filename)
-        
-        
 def get_region_urls(wd, region):
         search_input = wd.driver.find_element_by_id('advisors-filter-location-input')
         search_input.clear()
         search_input.send_keys(region)
         wd.driver.implicitly_wait(5)
         search_input.send_keys(u'\ue007')
+        wd.driver.implicitly_wait(5)
         search_input.send_keys(u'\ue007')
         print('in the region page')
-
-#    contents = wd.driver.find_elements_by_tag_name('a')
-#    region_urls = []
-#    region_names = []
-#    for content in contents:
-#        text= 'https://www.xero.com/nz/advisors/find-advisors/?type=advisors';
-#        if text in content.get_attribute('href'):
-#            
-#            link = content.get_attribute('href')
-#            region_urls.append(link)
-#            
-#            name = content.text
-#            region_names.append(name)
-#        
-#    return pd.DataFrame({'Region_URL': region_urls, 'Region_Name': region_names})
     
-def go_next_page():
-    try:
-        next_button = wd.driver.find_element_by_class_name('is-dormant')
-    except:
-        advisor_df, number_pages = get_advisor_url(wd, region_url)
-        next_button = wd.driver.find_element_by_class_name('pagination-next')
-        next_button.click()
+#def go_next_page():
+#    try:
+#        next_button = wd.driver.find_element_by_class_name('is-dormant')
+#    except:
+#        advisor_df, number_pages = get_advisor_url(wd, region_url)
+#        next_button = wd.driver.find_element_by_class_name('pagination-next')
+#        next_button.click()
+#    
     
+#def get_advisor_url_pagination():
+#    temp_advisor_urls=[]
+#    temp_advisors=[] 
+#    advisor_names = wd.driver.find_elements_by_class_name('advisors-result-card-brand-image')
+#    advisor_links = wd.driver.find_elements_by_class_name('advisors-result-card-link')
+#    for i in range(len(advisor_names)):
+#        temp_advisors.append(advisor_names[i].get_attribute('alt'))
+#        temp_advisor_urls.append(advisor_links[i].get_attribute('href'))
     
-def get_advisor_url_pagination():
-    temp_advisor_urls=[]
-    temp_advisors=[] 
-    advisor_names = wd.driver.find_elements_by_class_name('advisors-result-card-brand-image')
-    advisor_links = wd.driver.find_elements_by_class_name('advisors-result-card-link')
-    for i in range(len(advisor_names)):
-        temp_advisors.append(advisor_names[i].get_attribute('alt'))
-        temp_advisor_urls.append(advisor_links[i].get_attribute('href'))
-    
-    return pd.DataFrame({'Advisor_url': temp_advisor_urls, 'Advisor': temp_advisors})   
+#    return pd.DataFrame({'Advisor_url': temp_advisor_urls, 'Advisor': temp_advisors})   
   
 def pagination(wd, n_retries = 0, retry_limit = 20):
     try:
@@ -298,33 +163,10 @@ def pagination(wd, n_retries = 0, retry_limit = 20):
             raise e
         pagination(wd, n_retries + 1)
     sleep(2)
-        
-        
-        
-        
-#        print("element not found")
-#        next_button = None
-#        count = 0
-#        count_timeout_limit = 10
-#        while next_button is None:
-#            sleep(2)
-#            try:
-#                next_button = wd.driver.find_element_by_xpath("//button[@class='pagination-direction pagination-next']")
-#                next_button.click()
-#                print("clicked")
-#            except ElementNotInteractableException:
-#                count += 1
-#                print("Retry #{}: element still not found".format(count))
-#            if count >= count_timeout_limit:
-#                break
-    
-def get_advisor_url(wd, region_url, first):
+  
+def get_advisor_url(wd, first):
     advisor_urls=[]
     advisors=[] 
-    print("get_advisor "+region_url)
-    
-#    if Current_page_url:
-#        wd.driver.get(Current_page_url)
     sleep(5)
     advisor_names = wd.driver.find_elements_by_class_name('advisors-result-card-brand-image')
     advisor_links = wd.driver.find_elements_by_class_name('advisors-result-card-link')
@@ -345,9 +187,6 @@ def get_advisor_url(wd, region_url, first):
     advisor_data['advisor_url_df']= pd.DataFrame({'Advisor_url': advisor_urls, 'Advisor': advisors})
     advisor_data['page_numbers'] = round(advisor_pages)
     print('page numbers'+ str(round(advisor_pages)))
-#    advisor_data['advisor_page'] = Current_page_url
-#    print("advisor_page"+advisor_data['advisor_page'])
-        
     return advisor_data
 
 
@@ -368,7 +207,9 @@ def get_advisor_apps(wd, advisor_df, location, page, Current_page_url):
           
 
 def search_by_region(wd, base_url, region):
+    
     wd.driver.get(base_url)
+    sleep(5)
     search_input = wd.driver.find_element_by_id('advisors-filter-location-input')
     search_input.send_keys(Keys.CONTROL + "a");
     search_input.send_keys(Keys.DELETE);
@@ -386,7 +227,8 @@ def search_by_region(wd, base_url, region):
         state = 'null'
     sleep(5)
     search_input.send_keys(u'\ue007')
-    sleep(2)
+    sleep(5)
+    Current_page_url = wd.driver.current_url
     return search_input_text
 
 def write_csv(df, fp, fp_exists_mode = 'a', index = False, header = False):
@@ -406,8 +248,7 @@ def write_csv(df, fp, fp_exists_mode = 'a', index = False, header = False):
 def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=True, driver_path = "default"):
     
 #    os.system("export PYTHONIOENCODING=utf8")
-  
-    print('command should run')
+
     outdir = Path(datadir) / 'out/tables/'
     
     if sys.platform.startswith("win"):
@@ -418,36 +259,24 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
         #start new
     base_url = params.get('base_url', "https://www.xero.com/nz/advisors/find-advisors/")
     regions = params.get('regions')#use this format for optional arguments
-    filename = params.get('filename')
+#    filename = params.get('filename')
     wd = DriverBuilder(headless= headless, download_dir=download_dir, driver_path = driver_path)
     with wd:# USE wd.open() instead to open window and wd.close() to close window
-#        xero_apps_df = pd.DataFrame()
         for region in regions:
             location = search_by_region(wd, base_url, region)
             Current_page_url = wd.driver.current_url
-            advisor_data = get_advisor_url(wd, region, 0)
+            advisor_data = get_advisor_url(wd, 0)
             advisor_df = advisor_data['advisor_url_df']
             page_number = advisor_data['page_numbers']
-            
-            
-#            advisor_pagination_url = advisor_data['advisor_page']
             for k in range(1, page_number):
                 wd.driver.delete_all_cookies()
                 apps_df = get_advisor_apps(wd, advisor_df, location, k, Current_page_url)
-#                xero_apps_df = xero_apps_df.append(apps_df, ignore_index = True)
                 write_csv(df = apps_df, fp = Path(outdir) / (region + '.csv'))
-                print('appended')
-                print(len(apps_df))
                 pagination(wd)
                 Current_page_url = wd.driver.current_url
-                print(Current_page_url)
-                advisor_data = get_advisor_url(wd, Current_page_url, k)
+                advisor_data = get_advisor_url(wd, k)
                 advisor_df = advisor_data['advisor_url_df']
-#        xero_apps_df.to_csv (r'C:\Users\Nayana Patil\Github\xero-connected-app\tmp\downloads\Xero_Apps_NZ.csv', index = None, header=True)
-#       
-        
-        
-        
+     
 def testing():
         os.chdir("D:/xero_apps")
         with open("data/config.json") as f:
@@ -468,5 +297,5 @@ if __name__ == "__main__":
         traceback.print_exc()
         sys.exit(1)
         
-print("main.py finished.")
+#print("main.py finished.")
 
