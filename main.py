@@ -75,7 +75,7 @@ class DriverBuilder():
         if sys.platform.startswith("win") and not self.driver_path.endswith('.exe') and not self.driver_path.lower() == 'default':
             self.driver_path += ".exe"
             
-        print("Using driver path: {}".format(self.driver_path))
+#        print("Using driver path: {}".format(self.driver_path))
         
         if self.driver_path.lower() == 'default':
             self.driver = Chrome(chrome_options=self.chrome_options)
@@ -260,9 +260,9 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
     base_url = params.get('base_url', "https://www.xero.com/nz/advisors/find-advisors/")
     regions = params.get('regions')#use this format for optional arguments
 #    filename = params.get('filename')
-    wd = DriverBuilder(headless= headless, download_dir=download_dir, driver_path = driver_path)
-    with wd:# USE wd.open() instead to open window and wd.close() to close window
-        for region in regions:
+    for region in regions:
+            wd = DriverBuilder(headless= headless, download_dir=download_dir, driver_path = driver_path)
+            with wd:# USE wd.open() instead to open window and wd.close() to close window
             location = search_by_region(wd, base_url, region)
             Current_page_url = wd.driver.current_url
             advisor_data = get_advisor_url(wd, 0)
