@@ -259,8 +259,8 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
     regions = params.get('regions')#use this format for optional arguments
 #    filename = params.get('filename')
     for region in regions:
-            wd = DriverBuilder(headless= headless, download_dir=download_dir, driver_path = driver_path)
-            with wd:# USE wd.open() instead to open window and wd.close() to close window
+        wd = DriverBuilder(headless= headless, download_dir=download_dir, driver_path = driver_path)
+        with wd:# USE wd.open() instead to open window and wd.close() to close window
             location = search_by_region(wd, base_url, region)
             Current_page_url = wd.driver.current_url
             advisor_data = get_advisor_url(wd, 0)
