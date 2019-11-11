@@ -128,7 +128,6 @@ def get_region_urls(wd, region):
         search_input.send_keys(u'\ue007')
         wd.driver.implicitly_wait(5)
         search_input.send_keys(u'\ue007')
-        print('in the region page')
     
 #def go_next_page():
 #    try:
@@ -158,7 +157,7 @@ def pagination(wd, n_retries = 0, retry_limit = 20):
         pass
     except ElementNotInteractableException as e:
         sleep(2)
-        print("Retry #{}: Element not interactable.".format(n_retries))
+        print("R :".format(n_retries))
         if n_retries >= retry_limit:
             raise e
         pagination(wd, n_retries + 1)
@@ -186,7 +185,6 @@ def get_advisor_url(wd, first):
     advisor_data=dict()
     advisor_data['advisor_url_df']= pd.DataFrame({'Advisor_url': advisor_urls, 'Advisor': advisors})
     advisor_data['page_numbers'] = round(advisor_pages)
-    print('page numbers'+ str(round(advisor_pages)))
     return advisor_data
 
 
@@ -273,6 +271,7 @@ def main(params, datadir = '/data/', download_dir = '/tmp/downloads/', headless=
                 apps_df = get_advisor_apps(wd, advisor_df, location, k, Current_page_url)
                 write_csv(df = apps_df, fp = Path(outdir) / (region + '.csv'))
                 pagination(wd)
+                MyVariable = None
                 Current_page_url = wd.driver.current_url
                 advisor_data = get_advisor_url(wd, k)
                 advisor_df = advisor_data['advisor_url_df']
